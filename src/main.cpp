@@ -2099,7 +2099,7 @@ bool CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoins
 
             CAmount local = paddrinfodb->GetRwdByPubkey(reward.senderPubkey);
             int64_t diffAmount = reward.rewardBalance - local;
-            if (abs(diffAmount) > 10)
+            if ( reward.rewardBalance > local && abs(diffAmount) > 10)
             {
                 return state.DoS(100, false, REJECT_INVALID, "bad-txns-balance-largethandb");
             }
@@ -2221,7 +2221,7 @@ bool CheckRewards(const CTransaction& tx, CValidationState &state, bool fScriptC
             const CAmount senderRwdInTx = tx.vreward[i].rewardBalance;
             const CAmount senderRwdInDB = paddrinfodb->GetRwdByPubkey(tx.vreward[i].senderPubkey);
             int64_t diffAmount2 = senderRwdInTx - senderRwdInDB;
-            if (abs(diffAmount2) > 10)
+            if (senderRwdInTx > senderRwdInDB && abs(diffAmount2) > 10)
                 return state.DoS(100,false, REJECT_INVALID, "reward-balance-verify-flag-failed");
 
             // Verify signature
